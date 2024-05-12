@@ -86,7 +86,7 @@ export default function Home() {
                             )}
                         </Stack>
                     </CardContent>
-                    <CardActions sx={{ display: 'flex', justifyContent: 'center' }}>
+                    <CardActions sx={{ display: 'flex', justifyContent: 'center', mb: 1 }}>
                         <Button variant="outlined" onClick={handleDecrement} disabled={!counter}>
                             {counter === 0 ? 'Sold Out!' : 'Sell Camera'}
                         </Button>

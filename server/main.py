@@ -4,7 +4,7 @@ from flask import Flask, Response
 app = Flask(__name__)
 
 
-@app.route('/api/health-check')
+@app.route('/health-check')
 def health_check():
     return Response(None, 200)
 

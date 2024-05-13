@@ -1,19 +1,19 @@
 # DEPENDENCIES
-FROM public.ecr.aws/docker/library/node:16-alpine AS deps
+FROM public.ecr.aws/docker/library/node:18-alpine AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm install --frozen-lockfile
 
 # BUILD
-FROM public.ecr.aws/docker/library/node:16-alpine AS builder
+FROM public.ecr.aws/docker/library/node:18-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npm run build
 
 # RUN
-FROM public.ecr.aws/docker/library/node:16-alpine AS runner
+FROM public.ecr.aws/docker/library/node:18-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV production

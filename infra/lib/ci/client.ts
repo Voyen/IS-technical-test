@@ -5,13 +5,13 @@ import { Construct } from 'constructs';
 import { BuildProps } from './ci';
 import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
 
-export class ServerBuild extends Construct {
+export class ClientBuild extends Construct {
     constructor(scope: Construct, id: string, props: BuildProps) {
         super(scope, id);
         const { logGroup } = props;
 
         const repo = new Repository(this, 'Repo', {
-            repositoryName: 'server',
+            repositoryName: 'client',
             imageScanOnPush: true,
             removalPolicy: RemovalPolicy.DESTROY,
         });
@@ -19,7 +19,7 @@ export class ServerBuild extends Construct {
         const source = Source.gitHub({
             owner: 'Voyen',
             repo: 'IS-technical-test',
-            webhookFilters: [FilterGroup.inEventOf(EventAction.PUSH).andBranchIs('main').andFilePathIs('^server/.*')],
+            webhookFilters: [FilterGroup.inEventOf(EventAction.PUSH).andBranchIs('main').andFilePathIs('^client/.*')],
         });
 
         const buildSpec = {
@@ -29,13 +29,13 @@ export class ServerBuild extends Construct {
                     commands: [
                         'env',
                         'aws ecr get-login-password --region ap-southeast-2 | docker login --username AWS --password-stdin $ECR_REPO_URI',
-                        'cd server',
+                        'cd client',
                     ],
                 },
                 build: {
                     commands: ['docker build -t $ECR_REPO_URI:$CODEBUILD_RESOLVED_SOURCE_VERSION -t $ECR_REPO_URI:latest .'],
                     finally: [
-                        'printf \'[{"name":"server","imageUri":"%s"}]\' $ECR_REPO_URI:$TAG > imagedefinitions.json',
+                        'printf \'[{"name":"client","imageUri":"%s"}]\' $ECR_REPO_URI:$TAG > imagedefinitions.json',
                         'cat imagedefinitions.json',
                     ],
                 },
@@ -49,7 +49,7 @@ export class ServerBuild extends Construct {
         };
 
         const buildProject = new Project(this, 'Build', {
-            projectName: 'server',
+            projectName: 'client',
             source,
             environment: {
                 buildImage: LinuxBuildImage.STANDARD_7_0,

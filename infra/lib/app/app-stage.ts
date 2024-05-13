@@ -1,9 +1,11 @@
-import { RemovalPolicy, Stack, Stage, StageProps } from 'aws-cdk-lib';
+import { Stack, Stage, StageProps } from 'aws-cdk-lib';
+import { Repository } from 'aws-cdk-lib/aws-ecr';
 import { Construct } from 'constructs';
+import { Deployment } from './deployment';
 import { Domain } from './domain';
-import { SecurityGroup, SubnetType, Vpc } from 'aws-cdk-lib/aws-ec2';
-import { Cluster, FargateTaskDefinition } from 'aws-cdk-lib/aws-ecs';
-import { LogGroup, RetentionDays } from 'aws-cdk-lib/aws-logs';
+import { LoadBalancer } from './load-balancer';
+import { Network } from './network';
+import { Services } from './services';
 
 export interface AppProps extends StageProps {
     domain: string;
@@ -20,43 +22,22 @@ class Application extends Stack {
     constructor(scope: Construct, id: string, props: AppProps) {
         super(scope, id, props);
 
-        const { domain } = props;
-
         // Domain
-        const { certificate, newHostedZone } = new Domain(this, 'Domain', { ...props, domain });
+        const { certificate, hostedZone } = new Domain(this, 'Domain', { ...props, domain: props.domain });
 
         // Network
-        const vpc = new Vpc(this, 'VPC', {
-            maxAzs: 2,
-            natGateways: 1,
-            subnetConfiguration: [
-                {
-                    cidrMask: 24,
-                    name: 'ingress',
-                    subnetType: SubnetType.PUBLIC,
-                },
-            ],
-        });
+        const { vpc } = new Network(this, 'Network');
 
         // Application
-        const cluster = new Cluster(this, 'Ecs', {
-            vpc,
-            containerInsights: true,
-        });
-        const securityGroup = new SecurityGroup(this, 'Internal', { vpc });
+        const clientRepo = Repository.fromRepositoryName(this, 'ClientRepo', 'client');
+        const serverRepo = Repository.fromRepositoryName(this, 'ServerRepo', 'server');
+        const { server, client } = new Services(this, 'Services', { vpc, clientRepo, serverRepo });
 
-        // Shared logs
-        const sharedLogsGroup = new LogGroup(this, 'AppLogs', {
-            removalPolicy: RemovalPolicy.DESTROY,
-            retention: RetentionDays.ONE_MONTH,
-        });
+        // Load Balancer
+        new LoadBalancer(this, 'LB', { vpc, hostedZone, certificate, client, server });
 
-        // Backend
-        const server = new FargateTaskDefinition(this, 'ServerTask', {
-            cpu: 512,
-            memoryLimitMiB: 1024,
-            family: 'server',
-        });
-        // const
+        // Deployments
+        new Deployment(this, 'ClientDeploy', { name: 'client', repo: clientRepo, service: client });
+        new Deployment(this, 'ServerDeploy', { name: 'server', repo: serverRepo, service: server });
     }
 }

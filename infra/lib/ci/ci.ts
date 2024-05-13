@@ -2,6 +2,7 @@ import { RemovalPolicy } from 'aws-cdk-lib';
 import { ILogGroup, LogGroup, RetentionDays } from 'aws-cdk-lib/aws-logs';
 import { Construct } from 'constructs';
 import { ServerBuild } from './server';
+import { ClientBuild } from './client';
 
 export interface BuildProps {
     logGroup: ILogGroup;
@@ -17,5 +18,6 @@ export class CI extends Construct {
         });
 
         new ServerBuild(this, 'Server', { logGroup });
+        new ClientBuild(this, 'Client', { logGroup });
     }
 }

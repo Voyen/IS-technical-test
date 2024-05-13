@@ -7,7 +7,7 @@ interface DomainProps {
 }
 
 export class Domain extends Construct {
-    public readonly newHostedZone: IHostedZone;
+    public readonly hostedZone: IHostedZone;
     public readonly certificate: ICertificate;
 
     constructor(scope: Construct, id: string, props: DomainProps) {
@@ -20,19 +20,19 @@ export class Domain extends Construct {
         });
         const FQDN = `${domain}.${rootHostedZone.zoneName}`;
 
-        this.newHostedZone = new PublicHostedZone(this, 'Zone', {
+        this.hostedZone = new PublicHostedZone(this, 'Zone', {
             zoneName: FQDN,
         });
 
         new ZoneDelegationRecord(this, 'Delegation', {
             zone: rootHostedZone,
-            recordName: this.newHostedZone.zoneName,
-            nameServers: this.newHostedZone.hostedZoneNameServers!,
+            recordName: this.hostedZone.zoneName,
+            nameServers: this.hostedZone.hostedZoneNameServers!,
         });
 
         this.certificate = new Certificate(this, 'Certificate', {
             domainName: FQDN,
-            validation: CertificateValidation.fromDns(this.newHostedZone),
+            validation: CertificateValidation.fromDns(this.hostedZone),
         });
     }
 }

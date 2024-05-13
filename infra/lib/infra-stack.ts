@@ -9,7 +9,7 @@ export class InfraStack extends cdk.Stack {
 
         const infraPipeline = new InfraPipeline(this, 'Infra', {
             pipelineName: 'MainInfraPipeline',
-            connectionArn: '',
+            connectionArn: 'arn:aws:codestar-connections:ap-southeast-2:646548289682:connection/63813c08-c1dd-4bcb-a9cc-ce68eb4c492d',
             infraRepository: 'IS-technical-test',
         });
 

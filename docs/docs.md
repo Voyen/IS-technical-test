@@ -22,6 +22,8 @@ make run # 'run' is optional, it's the default action
 make stop
 ```
 
+Due to proxy configurations, the web client can be accessed at `http://localhost` (without a port).
+
 ### Hot Reloadable
 
 Both the Server and Client apps are hot-reloadable in the development environment.

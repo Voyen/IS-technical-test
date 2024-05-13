@@ -87,6 +87,13 @@ This pipeline will take the `imageDetail.json` file that was output by the ECR S
 
 Once the file is ready for deployment, a manual approval step requires the developer to approve the deployment. Once approved, the new image will be deployed to the appropriate ECS Service.
 
+### Multiple Environments
+
+Under normal circumstances, this solution would be deployed to at least 2 environments; a testing/staging env, and a production one.
+When a new image is detected in ECR, it would first be deployed fully (without approval) to the testing environment, and then with manual approval to production.
+
+However since I am actually hosting this solution on my own personal AWS account, I intentionally did not create a testing environment to reduce my personal operating costs.
+
 ### Notes
 
 The generated CloudFormation templates for the solution can be found at:

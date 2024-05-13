@@ -75,16 +75,24 @@ Due to the simplicity of the exercise, this solution was not developed to be ful
 
 ### CI/CD
 
-The deployment pipeline consists of 2 parts; the CI, and the CD.
+The deployment pipeline consists of 2 parts; builds and deployments.
 
-The CI portion is implemented at the top level using the `CI` construct. This construct creates an ECR Repository, and a CodeBuild Project connected to the GitHub repository for each service.
+The build portion is implemented at the top level using the `CI` construct. This construct creates an ECR Repository, and a CodeBuild Project connected to the GitHub repository for each service.
 When a change is detected in either service's directory, the appropriate CodeBuild Project will automatically start with a webhook, build the project, containerise it, then push the new image to ECR.
 
-When a new image is detected in either ECR Repository, a CodePipeline will be triggered.
-This pipeline will take the `imageDetail.json` file that was output by the ECR Source Action, and convert it to an `imagedefinitions.json` file that ECS needs for deployments using the `jq` utility.
+When a new image is detected in either ECR Repository, a CodePipeline will be triggered to perform the deployment using the `Deployment` construct.
+This pipeline will take the `imageDetail.json` file that was output by the ECR Source Action, and convert it to an `imagedefinitions.json` file that ECS needs for deployments.
 
 Once the file is ready for deployment, a manual approval step requires the developer to approve the deployment. Once approved, the new image will be deployed to the appropriate ECS Service.
+
+### Notes
+
+The generated CloudFormation templates for the solution can be found at:
+- [Infrastructure](./CloudFormation-infra.json)
+- [Application](./CloudFormation-application.json)
 
 Given a more complex solution and more time, better solutions would be:
 - Use CodeDeploy to manage deployments at a more controllable level
 - Use Step Functions to handle canary deployments with multiple steps and traffic levels
+
+

@@ -1,0 +1,1513 @@
+{
+    "Resources": {
+        "InfraPipelineArtifactsBucket7D1725B1": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+                "BucketEncryption": {
+                    "ServerSideEncryptionConfiguration": [
+                        {
+                            "ServerSideEncryptionByDefault": {
+                                "SSEAlgorithm": "aws:kms"
+                            }
+                        }
+                    ]
+                },
+                "PublicAccessBlockConfiguration": {
+                    "BlockPublicAcls": true,
+                    "BlockPublicPolicy": true,
+                    "IgnorePublicAcls": true,
+                    "RestrictPublicBuckets": true
+                }
+            },
+            "UpdateReplacePolicy": "Retain",
+            "DeletionPolicy": "Retain",
+            "Metadata": {
+                "aws:cdk:path": "InfraStack/Infra/Pipeline/Pipeline/ArtifactsBucket/Resource"
+            }
+        },
+        "InfraPipelineArtifactsBucketPolicy8A928E71": {
+            "Type": "AWS::S3::BucketPolicy",
+            "Properties": {
+                "Bucket": {
+                    "Ref": "InfraPipelineArtifactsBucket7D1725B1"
+                },
+                "PolicyDocument": {
+                    "Statement": [
+                        {
+                            "Action": "s3:*",
+                            "Condition": {
+                                "Bool": {
+                                    "aws:SecureTransport": "false"
+                                }
+                            },
+                            "Effect": "Deny",
+                            "Principal": {
+                                "AWS": "*"
+                            },
+                            "Resource": [
+                                {
+                                    "Fn::GetAtt": ["InfraPipelineArtifactsBucket7D1725B1", "Arn"]
+                                },
+                                {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Fn::GetAtt": ["InfraPipelineArtifactsBucket7D1725B1", "Arn"]
+                                            },
+                                            "/*"
+                                        ]
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "Action": ["s3:GetBucket*", "s3:GetObject*", "s3:List*"],
+                            "Effect": "Allow",
+                            "Principal": {
+                                "AWS": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "arn:",
+                                            {
+                                                "Ref": "AWS::Partition"
+                                            },
+                                            ":iam::646548289682:role/cdk-hnb659fds-deploy-role-646548289682-ap-southeast-2"
+                                        ]
+                                    ]
+                                }
+                            },
+                            "Resource": [
+                                {
+                                    "Fn::GetAtt": ["InfraPipelineArtifactsBucket7D1725B1", "Arn"]
+                                },
+                                {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Fn::GetAtt": ["InfraPipelineArtifactsBucket7D1725B1", "Arn"]
+                                            },
+                                            "/*"
+                                        ]
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "Version": "2012-10-17"
+                }
+            },
+            "Metadata": {
+                "aws:cdk:path": "InfraStack/Infra/Pipeline/Pipeline/ArtifactsBucket/Policy/Resource"
+            }
+        },
+        "InfraPipelineRole1D0443D8": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Statement": [
+                        {
+                            "Action": "sts:AssumeRole",
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": "codepipeline.amazonaws.com"
+                            }
+                        }
+                    ],
+                    "Version": "2012-10-17"
+                }
+            },
+            "Metadata": {
+                "aws:cdk:path": "InfraStack/Infra/Pipeline/Pipeline/Role/Resource"
+            }
+        },
+        "InfraPipelineRoleDefaultPolicy94D979D1": {
+            "Type": "AWS::IAM::Policy",
+            "Properties": {
+                "PolicyDocument": {
+                    "Statement": [
+                        {
+                            "Action": [
+                                "s3:Abort*",
+                                "s3:DeleteObject*",
+                                "s3:GetBucket*",
+                                "s3:GetObject*",
+                                "s3:List*",
+                                "s3:PutObject",
+                                "s3:PutObjectLegalHold",
+                                "s3:PutObjectRetention",
+                                "s3:PutObjectTagging",
+                                "s3:PutObjectVersionTagging"
+                            ],
+                            "Effect": "Allow",
+                            "Resource": [
+                                {
+                                    "Fn::GetAtt": ["InfraPipelineArtifactsBucket7D1725B1", "Arn"]
+                                },
+                                {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Fn::GetAtt": ["InfraPipelineArtifactsBucket7D1725B1", "Arn"]
+                                            },
+                                            "/*"
+                                        ]
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "Action": "sts:AssumeRole",
+                            "Effect": "Allow",
+                            "Resource": [
+                                {
+                                    "Fn::GetAtt": ["InfraPipelineCodeBuildActionRole22A50BE9", "Arn"]
+                                },
+                                {
+                                    "Fn::GetAtt": ["InfraPipelineSourceVoyenIStechnicaltestCodePipelineActionRole8142DCB6", "Arn"]
+                                },
+                                {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "arn:",
+                                            {
+                                                "Ref": "AWS::Partition"
+                                            },
+                                            ":iam::646548289682:role/cdk-hnb659fds-deploy-role-646548289682-ap-southeast-2"
+                                        ]
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "Version": "2012-10-17"
+                },
+                "PolicyName": "InfraPipelineRoleDefaultPolicy94D979D1",
+                "Roles": [
+                    {
+                        "Ref": "InfraPipelineRole1D0443D8"
+                    }
+                ]
+            },
+            "Metadata": {
+                "aws:cdk:path": "InfraStack/Infra/Pipeline/Pipeline/Role/DefaultPolicy/Resource"
+            }
+        },
+        "InfraPipeline3B9A1724": {
+            "Type": "AWS::CodePipeline::Pipeline",
+            "Properties": {
+                "ArtifactStore": {
+                    "Location": {
+                        "Ref": "InfraPipelineArtifactsBucket7D1725B1"
+                    },
+                    "Type": "S3"
+                },
+                "Name": "MainInfraPipeline",
+                "PipelineType": "V1",
+                "RestartExecutionOnUpdate": true,
+                "RoleArn": {
+                    "Fn::GetAtt": ["InfraPipelineRole1D0443D8", "Arn"]
+                },
+                "Stages": [
+                    {
+                        "Actions": [
+                            {
+                                "ActionTypeId": {
+                                    "Category": "Source",
+                                    "Owner": "AWS",
+                                    "Provider": "CodeStarSourceConnection",
+                                    "Version": "1"
+                                },
+                                "Configuration": {
+                                    "ConnectionArn": "arn:aws:codestar-connections:ap-southeast-2:646548289682:connection/63813c08-c1dd-4bcb-a9cc-ce68eb4c492d",
+                                    "FullRepositoryId": "Voyen/IS-technical-test",
+                                    "BranchName": "main"
+                                },
+                                "Name": "Voyen_IS-technical-test",
+                                "OutputArtifacts": [
+                                    {
+                                        "Name": "Voyen_IS_technical_test_Source"
+                                    }
+                                ],
+                                "RoleArn": {
+                                    "Fn::GetAtt": ["InfraPipelineSourceVoyenIStechnicaltestCodePipelineActionRole8142DCB6", "Arn"]
+                                },
+                                "RunOrder": 1
+                            }
+                        ],
+                        "Name": "Source"
+                    },
+                    {
+                        "Actions": [
+                            {
+                                "ActionTypeId": {
+                                    "Category": "Build",
+                                    "Owner": "AWS",
+                                    "Provider": "CodeBuild",
+                                    "Version": "1"
+                                },
+                                "Configuration": {
+                                    "ProjectName": {
+                                        "Ref": "InfraPipelineBuildSynthCdkBuildProjectF60FAD14"
+                                    },
+                                    "EnvironmentVariables": "[{\"name\":\"_PROJECT_CONFIG_HASH\",\"type\":\"PLAINTEXT\",\"value\":\"bb3636f058aae6d4d417a0e6546300196132c3042706b23ca0d5d02b73c44d7b\"}]"
+                                },
+                                "InputArtifacts": [
+                                    {
+                                        "Name": "Voyen_IS_technical_test_Source"
+                                    }
+                                ],
+                                "Name": "Synth",
+                                "OutputArtifacts": [
+                                    {
+                                        "Name": "Synth_Output"
+                                    }
+                                ],
+                                "RoleArn": {
+                                    "Fn::GetAtt": ["InfraPipelineCodeBuildActionRole22A50BE9", "Arn"]
+                                },
+                                "RunOrder": 1
+                            }
+                        ],
+                        "Name": "Build"
+                    },
+                    {
+                        "Actions": [
+                            {
+                                "ActionTypeId": {
+                                    "Category": "Build",
+                                    "Owner": "AWS",
+                                    "Provider": "CodeBuild",
+                                    "Version": "1"
+                                },
+                                "Configuration": {
+                                    "ProjectName": {
+                                        "Ref": "InfraPipelineUpdatePipelineSelfMutation20FAB184"
+                                    },
+                                    "EnvironmentVariables": "[{\"name\":\"_PROJECT_CONFIG_HASH\",\"type\":\"PLAINTEXT\",\"value\":\"165d7e1ae69183a4411b0a833e6f6246eaba23bc9bc4ead613b5e26e22b46c5e\"}]"
+                                },
+                                "InputArtifacts": [
+                                    {
+                                        "Name": "Synth_Output"
+                                    }
+                                ],
+                                "Name": "SelfMutate",
+                                "RoleArn": {
+                                    "Fn::GetAtt": ["InfraPipelineCodeBuildActionRole22A50BE9", "Arn"]
+                                },
+                                "RunOrder": 1
+                            }
+                        ],
+                        "Name": "UpdatePipeline"
+                    },
+                    {
+                        "Actions": [
+                            {
+                                "ActionTypeId": {
+                                    "Category": "Build",
+                                    "Owner": "AWS",
+                                    "Provider": "CodeBuild",
+                                    "Version": "1"
+                                },
+                                "Configuration": {
+                                    "ProjectName": {
+                                        "Ref": "InfraPipelineAssetsFileAsset1D6C8A72C"
+                                    }
+                                },
+                                "InputArtifacts": [
+                                    {
+                                        "Name": "Synth_Output"
+                                    }
+                                ],
+                                "Name": "FileAsset1",
+                                "RoleArn": {
+                                    "Fn::GetAtt": ["InfraPipelineCodeBuildActionRole22A50BE9", "Arn"]
+                                },
+                                "RunOrder": 1
+                            },
+                            {
+                                "ActionTypeId": {
+                                    "Category": "Build",
+                                    "Owner": "AWS",
+                                    "Provider": "CodeBuild",
+                                    "Version": "1"
+                                },
+                                "Configuration": {
+                                    "ProjectName": {
+                                        "Ref": "InfraPipelineAssetsFileAsset29D82BD34"
+                                    }
+                                },
+                                "InputArtifacts": [
+                                    {
+                                        "Name": "Synth_Output"
+                                    }
+                                ],
+                                "Name": "FileAsset2",
+                                "RoleArn": {
+                                    "Fn::GetAtt": ["InfraPipelineCodeBuildActionRole22A50BE9", "Arn"]
+                                },
+                                "RunOrder": 1
+                            }
+                        ],
+                        "Name": "Assets"
+                    },
+                    {
+                        "Actions": [
+                            {
+                                "ActionTypeId": {
+                                    "Category": "Deploy",
+                                    "Owner": "AWS",
+                                    "Provider": "CloudFormation",
+                                    "Version": "1"
+                                },
+                                "Configuration": {
+                                    "StackName": "Prod-Stage",
+                                    "Capabilities": "CAPABILITY_NAMED_IAM,CAPABILITY_AUTO_EXPAND",
+                                    "RoleArn": {
+                                        "Fn::Join": [
+                                            "",
+                                            [
+                                                "arn:",
+                                                {
+                                                    "Ref": "AWS::Partition"
+                                                },
+                                                ":iam::646548289682:role/cdk-hnb659fds-cfn-exec-role-646548289682-ap-southeast-2"
+                                            ]
+                                        ]
+                                    },
+                                    "ActionMode": "CREATE_UPDATE",
+                                    "TemplatePath": "Synth_Output::assembly-InfraStack-Prod/InfraStackProdStage0007FCA0.template.json"
+                                },
+                                "InputArtifacts": [
+                                    {
+                                        "Name": "Synth_Output"
+                                    }
+                                ],
+                                "Name": "Deploy",
+                                "RoleArn": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "arn:",
+                                            {
+                                                "Ref": "AWS::Partition"
+                                            },
+                                            ":iam::646548289682:role/cdk-hnb659fds-deploy-role-646548289682-ap-southeast-2"
+                                        ]
+                                    ]
+                                },
+                                "RunOrder": 1
+                            }
+                        ],
+                        "Name": "Prod"
+                    }
+                ]
+            },
+            "DependsOn": ["InfraPipelineRoleDefaultPolicy94D979D1", "InfraPipelineRole1D0443D8"],
+            "Metadata": {
+                "aws:cdk:path": "InfraStack/Infra/Pipeline/Pipeline/Resource"
+            }
+        },
+        "InfraPipelineSourceVoyenIStechnicaltestCodePipelineActionRole8142DCB6": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Statement": [
+                        {
+                            "Action": "sts:AssumeRole",
+                            "Effect": "Allow",
+                            "Principal": {
+                                "AWS": "arn:aws:iam::646548289682:root"
+                            }
+                        }
+                    ],
+                    "Version": "2012-10-17"
+                }
+            },
+            "Metadata": {
+                "aws:cdk:path": "InfraStack/Infra/Pipeline/Pipeline/Source/Voyen_IS-technical-test/CodePipelineActionRole/Resource"
+            }
+        },
+        "InfraPipelineSourceVoyenIStechnicaltestCodePipelineActionRoleDefaultPolicy3A5EE8C9": {
+            "Type": "AWS::IAM::Policy",
+            "Properties": {
+                "PolicyDocument": {
+                    "Statement": [
+                        {
+                            "Action": "codestar-connections:UseConnection",
+                            "Effect": "Allow",
+                            "Resource": "arn:aws:codestar-connections:ap-southeast-2:646548289682:connection/63813c08-c1dd-4bcb-a9cc-ce68eb4c492d"
+                        },
+                        {
+                            "Action": [
+                                "s3:Abort*",
+                                "s3:DeleteObject*",
+                                "s3:GetBucket*",
+                                "s3:GetObject*",
+                                "s3:List*",
+                                "s3:PutObject",
+                                "s3:PutObjectLegalHold",
+                                "s3:PutObjectRetention",
+                                "s3:PutObjectTagging",
+                                "s3:PutObjectVersionTagging"
+                            ],
+                            "Effect": "Allow",
+                            "Resource": [
+                                {
+                                    "Fn::GetAtt": ["InfraPipelineArtifactsBucket7D1725B1", "Arn"]
+                                },
+                                {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Fn::GetAtt": ["InfraPipelineArtifactsBucket7D1725B1", "Arn"]
+                                            },
+                                            "/*"
+                                        ]
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "Action": ["s3:PutObjectAcl", "s3:PutObjectVersionAcl"],
+                            "Effect": "Allow",
+                            "Resource": {
+                                "Fn::Join": [
+                                    "",
+                                    [
+                                        {
+                                            "Fn::GetAtt": ["InfraPipelineArtifactsBucket7D1725B1", "Arn"]
+                                        },
+                                        "/*"
+                                    ]
+                                ]
+                            }
+                        }
+                    ],
+                    "Version": "2012-10-17"
+                },
+                "PolicyName": "InfraPipelineSourceVoyenIStechnicaltestCodePipelineActionRoleDefaultPolicy3A5EE8C9",
+                "Roles": [
+                    {
+                        "Ref": "InfraPipelineSourceVoyenIStechnicaltestCodePipelineActionRole8142DCB6"
+                    }
+                ]
+            },
+            "Metadata": {
+                "aws:cdk:path": "InfraStack/Infra/Pipeline/Pipeline/Source/Voyen_IS-technical-test/CodePipelineActionRole/DefaultPolicy/Resource"
+            }
+        },
+        "InfraPipelineBuildSynthCdkBuildProjectRole4E7D1C4B": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Statement": [
+                        {
+                            "Action": "sts:AssumeRole",
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": "codebuild.amazonaws.com"
+                            }
+                        }
+                    ],
+                    "Version": "2012-10-17"
+                }
+            },
+            "Metadata": {
+                "aws:cdk:path": "InfraStack/Infra/Pipeline/Pipeline/Build/Synth/CdkBuildProject/Role/Resource"
+            }
+        },
+        "InfraPipelineBuildSynthCdkBuildProjectRoleDefaultPolicyA0E7F4EE": {
+            "Type": "AWS::IAM::Policy",
+            "Properties": {
+                "PolicyDocument": {
+                    "Statement": [
+                        {
+                            "Action": ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"],
+                            "Effect": "Allow",
+                            "Resource": [
+                                {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "arn:aws:logs:ap-southeast-2:646548289682:log-group:/aws/codebuild/",
+                                            {
+                                                "Ref": "InfraPipelineBuildSynthCdkBuildProjectF60FAD14"
+                                            },
+                                            ":*"
+                                        ]
+                                    ]
+                                },
+                                {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "arn:aws:logs:ap-southeast-2:646548289682:log-group:/aws/codebuild/",
+                                            {
+                                                "Ref": "InfraPipelineBuildSynthCdkBuildProjectF60FAD14"
+                                            }
+                                        ]
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "Action": [
+                                "codebuild:BatchPutCodeCoverages",
+                                "codebuild:BatchPutTestCases",
+                                "codebuild:CreateReport",
+                                "codebuild:CreateReportGroup",
+                                "codebuild:UpdateReport"
+                            ],
+                            "Effect": "Allow",
+                            "Resource": {
+                                "Fn::Join": [
+                                    "",
+                                    [
+                                        "arn:aws:codebuild:ap-southeast-2:646548289682:report-group/",
+                                        {
+                                            "Ref": "InfraPipelineBuildSynthCdkBuildProjectF60FAD14"
+                                        },
+                                        "-*"
+                                    ]
+                                ]
+                            }
+                        },
+                        {
+                            "Action": [
+                                "s3:Abort*",
+                                "s3:DeleteObject*",
+                                "s3:GetBucket*",
+                                "s3:GetObject*",
+                                "s3:List*",
+                                "s3:PutObject",
+                                "s3:PutObjectLegalHold",
+                                "s3:PutObjectRetention",
+                                "s3:PutObjectTagging",
+                                "s3:PutObjectVersionTagging"
+                            ],
+                            "Effect": "Allow",
+                            "Resource": [
+                                {
+                                    "Fn::GetAtt": ["InfraPipelineArtifactsBucket7D1725B1", "Arn"]
+                                },
+                                {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Fn::GetAtt": ["InfraPipelineArtifactsBucket7D1725B1", "Arn"]
+                                            },
+                                            "/*"
+                                        ]
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "Version": "2012-10-17"
+                },
+                "PolicyName": "InfraPipelineBuildSynthCdkBuildProjectRoleDefaultPolicyA0E7F4EE",
+                "Roles": [
+                    {
+                        "Ref": "InfraPipelineBuildSynthCdkBuildProjectRole4E7D1C4B"
+                    }
+                ]
+            },
+            "Metadata": {
+                "aws:cdk:path": "InfraStack/Infra/Pipeline/Pipeline/Build/Synth/CdkBuildProject/Role/DefaultPolicy/Resource"
+            }
+        },
+        "InfraPipelineBuildSynthCdkBuildProjectF60FAD14": {
+            "Type": "AWS::CodeBuild::Project",
+            "Properties": {
+                "Artifacts": {
+                    "Type": "CODEPIPELINE"
+                },
+                "Cache": {
+                    "Type": "NO_CACHE"
+                },
+                "Description": "Pipeline step InfraStack/Pipeline/Build/Synth",
+                "EncryptionKey": "alias/aws/s3",
+                "Environment": {
+                    "ComputeType": "BUILD_GENERAL1_SMALL",
+                    "Image": "aws/codebuild/standard:7.0",
+                    "ImagePullCredentialsType": "CODEBUILD",
+                    "PrivilegedMode": false,
+                    "Type": "LINUX_CONTAINER"
+                },
+                "ServiceRole": {
+                    "Fn::GetAtt": ["InfraPipelineBuildSynthCdkBuildProjectRole4E7D1C4B", "Arn"]
+                },
+                "Source": {
+                    "BuildSpec": "{\n  \"version\": \"0.2\",\n  \"phases\": {\n    \"build\": {\n      \"commands\": [\n        \"env\",\n        \"cd infra\",\n        \"n stable\",\n        \"npm ci\",\n        \"npm run build\",\n        \"npx cdk synth\"\n      ]\n    }\n  },\n  \"artifacts\": {\n    \"base-directory\": \"infra/cdk.out\",\n    \"files\": \"**/*\"\n  }\n}",
+                    "Type": "CODEPIPELINE"
+                }
+            },
+            "Metadata": {
+                "aws:cdk:path": "InfraStack/Infra/Pipeline/Pipeline/Build/Synth/CdkBuildProject/Resource"
+            }
+        },
+        "InfraPipelineCodeBuildActionRole22A50BE9": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Statement": [
+                        {
+                            "Action": "sts:AssumeRole",
+                            "Effect": "Allow",
+                            "Principal": {
+                                "AWS": {
+                                    "Fn::GetAtt": ["InfraPipelineRole1D0443D8", "Arn"]
+                                }
+                            }
+                        }
+                    ],
+                    "Version": "2012-10-17"
+                }
+            },
+            "Metadata": {
+                "aws:cdk:path": "InfraStack/Infra/Pipeline/CodeBuildActionRole/Resource"
+            }
+        },
+        "InfraPipelineCodeBuildActionRoleDefaultPolicy27B7536B": {
+            "Type": "AWS::IAM::Policy",
+            "Properties": {
+                "PolicyDocument": {
+                    "Statement": [
+                        {
+                            "Action": ["codebuild:BatchGetBuilds", "codebuild:StartBuild", "codebuild:StopBuild"],
+                            "Effect": "Allow",
+                            "Resource": [
+                                {
+                                    "Fn::GetAtt": ["InfraPipelineAssetsFileAsset1D6C8A72C", "Arn"]
+                                },
+                                {
+                                    "Fn::GetAtt": ["InfraPipelineAssetsFileAsset29D82BD34", "Arn"]
+                                },
+                                {
+                                    "Fn::GetAtt": ["InfraPipelineBuildSynthCdkBuildProjectF60FAD14", "Arn"]
+                                },
+                                {
+                                    "Fn::GetAtt": ["InfraPipelineUpdatePipelineSelfMutation20FAB184", "Arn"]
+                                }
+                            ]
+                        }
+                    ],
+                    "Version": "2012-10-17"
+                },
+                "PolicyName": "InfraPipelineCodeBuildActionRoleDefaultPolicy27B7536B",
+                "Roles": [
+                    {
+                        "Ref": "InfraPipelineCodeBuildActionRole22A50BE9"
+                    }
+                ]
+            },
+            "Metadata": {
+                "aws:cdk:path": "InfraStack/Infra/Pipeline/CodeBuildActionRole/DefaultPolicy/Resource"
+            }
+        },
+        "InfraPipelineUpdatePipelineSelfMutationRole5F122432": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Statement": [
+                        {
+                            "Action": "sts:AssumeRole",
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": "codebuild.amazonaws.com"
+                            }
+                        }
+                    ],
+                    "Version": "2012-10-17"
+                }
+            },
+            "Metadata": {
+                "aws:cdk:path": "InfraStack/Infra/Pipeline/UpdatePipeline/SelfMutation/Role/Resource"
+            }
+        },
+        "InfraPipelineUpdatePipelineSelfMutationRoleDefaultPolicyFE714329": {
+            "Type": "AWS::IAM::Policy",
+            "Properties": {
+                "PolicyDocument": {
+                    "Statement": [
+                        {
+                            "Action": ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"],
+                            "Effect": "Allow",
+                            "Resource": [
+                                {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "arn:aws:logs:ap-southeast-2:646548289682:log-group:/aws/codebuild/",
+                                            {
+                                                "Ref": "InfraPipelineUpdatePipelineSelfMutation20FAB184"
+                                            },
+                                            ":*"
+                                        ]
+                                    ]
+                                },
+                                {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "arn:aws:logs:ap-southeast-2:646548289682:log-group:/aws/codebuild/",
+                                            {
+                                                "Ref": "InfraPipelineUpdatePipelineSelfMutation20FAB184"
+                                            }
+                                        ]
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "Action": [
+                                "codebuild:BatchPutCodeCoverages",
+                                "codebuild:BatchPutTestCases",
+                                "codebuild:CreateReport",
+                                "codebuild:CreateReportGroup",
+                                "codebuild:UpdateReport"
+                            ],
+                            "Effect": "Allow",
+                            "Resource": {
+                                "Fn::Join": [
+                                    "",
+                                    [
+                                        "arn:aws:codebuild:ap-southeast-2:646548289682:report-group/",
+                                        {
+                                            "Ref": "InfraPipelineUpdatePipelineSelfMutation20FAB184"
+                                        },
+                                        "-*"
+                                    ]
+                                ]
+                            }
+                        },
+                        {
+                            "Action": "sts:AssumeRole",
+                            "Condition": {
+                                "ForAnyValue:StringEquals": {
+                                    "iam:ResourceTag/aws-cdk:bootstrap-role": ["image-publishing", "file-publishing", "deploy"]
+                                }
+                            },
+                            "Effect": "Allow",
+                            "Resource": "arn:*:iam::646548289682:role/*"
+                        },
+                        {
+                            "Action": ["cloudformation:DescribeStacks", "s3:ListBucket"],
+                            "Effect": "Allow",
+                            "Resource": "*"
+                        },
+                        {
+                            "Action": ["s3:GetBucket*", "s3:GetObject*", "s3:List*"],
+                            "Effect": "Allow",
+                            "Resource": [
+                                {
+                                    "Fn::GetAtt": ["InfraPipelineArtifactsBucket7D1725B1", "Arn"]
+                                },
+                                {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Fn::GetAtt": ["InfraPipelineArtifactsBucket7D1725B1", "Arn"]
+                                            },
+                                            "/*"
+                                        ]
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "Version": "2012-10-17"
+                },
+                "PolicyName": "InfraPipelineUpdatePipelineSelfMutationRoleDefaultPolicyFE714329",
+                "Roles": [
+                    {
+                        "Ref": "InfraPipelineUpdatePipelineSelfMutationRole5F122432"
+                    }
+                ]
+            },
+            "Metadata": {
+                "aws:cdk:path": "InfraStack/Infra/Pipeline/UpdatePipeline/SelfMutation/Role/DefaultPolicy/Resource"
+            }
+        },
+        "InfraPipelineUpdatePipelineSelfMutation20FAB184": {
+            "Type": "AWS::CodeBuild::Project",
+            "Properties": {
+                "Artifacts": {
+                    "Type": "CODEPIPELINE"
+                },
+                "Cache": {
+                    "Type": "NO_CACHE"
+                },
+                "Description": "Pipeline step InfraStack/Pipeline/UpdatePipeline/SelfMutate",
+                "EncryptionKey": "alias/aws/s3",
+                "Environment": {
+                    "ComputeType": "BUILD_GENERAL1_SMALL",
+                    "Image": "aws/codebuild/standard:7.0",
+                    "ImagePullCredentialsType": "CODEBUILD",
+                    "PrivilegedMode": false,
+                    "Type": "LINUX_CONTAINER"
+                },
+                "Name": "MainInfraPipeline-selfupdate",
+                "ServiceRole": {
+                    "Fn::GetAtt": ["InfraPipelineUpdatePipelineSelfMutationRole5F122432", "Arn"]
+                },
+                "Source": {
+                    "BuildSpec": "{\n  \"version\": \"0.2\",\n  \"phases\": {\n    \"install\": {\n      \"commands\": [\n        \"npm install -g aws-cdk@2\"\n      ]\n    },\n    \"build\": {\n      \"commands\": [\n        \"cdk -a . deploy InfraStack --require-approval=never --verbose\"\n      ]\n    }\n  }\n}",
+                    "Type": "CODEPIPELINE"
+                }
+            },
+            "Metadata": {
+                "aws:cdk:path": "InfraStack/Infra/Pipeline/UpdatePipeline/SelfMutation/Resource"
+            }
+        },
+        "InfraPipelineAssetsFileRoleF8402086": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Statement": [
+                        {
+                            "Action": "sts:AssumeRole",
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": "codebuild.amazonaws.com"
+                            }
+                        }
+                    ],
+                    "Version": "2012-10-17"
+                }
+            },
+            "Metadata": {
+                "aws:cdk:path": "InfraStack/Infra/Pipeline/Assets/FileRole/Resource"
+            }
+        },
+        "InfraPipelineAssetsFileRoleDefaultPolicyDE9D9E5F": {
+            "Type": "AWS::IAM::Policy",
+            "Properties": {
+                "PolicyDocument": {
+                    "Statement": [
+                        {
+                            "Action": ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"],
+                            "Effect": "Allow",
+                            "Resource": "arn:aws:logs:ap-southeast-2:646548289682:log-group:/aws/codebuild/*"
+                        },
+                        {
+                            "Action": [
+                                "codebuild:BatchPutCodeCoverages",
+                                "codebuild:BatchPutTestCases",
+                                "codebuild:CreateReport",
+                                "codebuild:CreateReportGroup",
+                                "codebuild:UpdateReport"
+                            ],
+                            "Effect": "Allow",
+                            "Resource": "arn:aws:codebuild:ap-southeast-2:646548289682:report-group/*"
+                        },
+                        {
+                            "Action": ["codebuild:BatchGetBuilds", "codebuild:StartBuild", "codebuild:StopBuild"],
+                            "Effect": "Allow",
+                            "Resource": "*"
+                        },
+                        {
+                            "Action": "sts:AssumeRole",
+                            "Effect": "Allow",
+                            "Resource": {
+                                "Fn::Sub": "arn:${AWS::Partition}:iam::646548289682:role/cdk-hnb659fds-file-publishing-role-646548289682-ap-southeast-2"
+                            }
+                        },
+                        {
+                            "Action": ["s3:GetBucket*", "s3:GetObject*", "s3:List*"],
+                            "Effect": "Allow",
+                            "Resource": [
+                                {
+                                    "Fn::GetAtt": ["InfraPipelineArtifactsBucket7D1725B1", "Arn"]
+                                },
+                                {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Fn::GetAtt": ["InfraPipelineArtifactsBucket7D1725B1", "Arn"]
+                                            },
+                                            "/*"
+                                        ]
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "Version": "2012-10-17"
+                },
+                "PolicyName": "InfraPipelineAssetsFileRoleDefaultPolicyDE9D9E5F",
+                "Roles": [
+                    {
+                        "Ref": "InfraPipelineAssetsFileRoleF8402086"
+                    }
+                ]
+            },
+            "Metadata": {
+                "aws:cdk:path": "InfraStack/Infra/Pipeline/Assets/FileRole/DefaultPolicy/Resource"
+            }
+        },
+        "InfraPipelineAssetsFileAsset1D6C8A72C": {
+            "Type": "AWS::CodeBuild::Project",
+            "Properties": {
+                "Artifacts": {
+                    "Type": "CODEPIPELINE"
+                },
+                "Cache": {
+                    "Type": "NO_CACHE"
+                },
+                "Description": "Pipeline step InfraStack/Pipeline/Assets/FileAsset1",
+                "EncryptionKey": "alias/aws/s3",
+                "Environment": {
+                    "ComputeType": "BUILD_GENERAL1_SMALL",
+                    "Image": "aws/codebuild/standard:7.0",
+                    "ImagePullCredentialsType": "CODEBUILD",
+                    "PrivilegedMode": false,
+                    "Type": "LINUX_CONTAINER"
+                },
+                "ServiceRole": {
+                    "Fn::GetAtt": ["InfraPipelineAssetsFileRoleF8402086", "Arn"]
+                },
+                "Source": {
+                    "BuildSpec": "{\n  \"version\": \"0.2\",\n  \"phases\": {\n    \"install\": {\n      \"commands\": [\n        \"npm install -g cdk-assets@2\"\n      ]\n    },\n    \"build\": {\n      \"commands\": [\n        \"cdk-assets --path \\\"assembly-InfraStack-Prod/InfraStackProdStage0007FCA0.assets.json\\\" --verbose publish \\\"ee7de53d64cc9d6248fa6aa550f92358f6c907b5efd6f3298aeab1b5e7ea358a:646548289682-ap-southeast-2\\\"\"\n      ]\n    }\n  }\n}",
+                    "Type": "CODEPIPELINE"
+                }
+            },
+            "Metadata": {
+                "aws:cdk:path": "InfraStack/Infra/Pipeline/Assets/FileAsset1/Resource"
+            }
+        },
+        "InfraPipelineAssetsFileAsset29D82BD34": {
+            "Type": "AWS::CodeBuild::Project",
+            "Properties": {
+                "Artifacts": {
+                    "Type": "CODEPIPELINE"
+                },
+                "Cache": {
+                    "Type": "NO_CACHE"
+                },
+                "Description": "Pipeline step InfraStack/Pipeline/Assets/FileAsset2",
+                "EncryptionKey": "alias/aws/s3",
+                "Environment": {
+                    "ComputeType": "BUILD_GENERAL1_SMALL",
+                    "Image": "aws/codebuild/standard:7.0",
+                    "ImagePullCredentialsType": "CODEBUILD",
+                    "PrivilegedMode": false,
+                    "Type": "LINUX_CONTAINER"
+                },
+                "ServiceRole": {
+                    "Fn::GetAtt": ["InfraPipelineAssetsFileRoleF8402086", "Arn"]
+                },
+                "Source": {
+                    "BuildSpec": "{\n  \"version\": \"0.2\",\n  \"phases\": {\n    \"install\": {\n      \"commands\": [\n        \"npm install -g cdk-assets@2\"\n      ]\n    },\n    \"build\": {\n      \"commands\": [\n        \"cdk-assets --path \\\"assembly-InfraStack-Prod/InfraStackProdStage0007FCA0.assets.json\\\" --verbose publish \\\"2eb6a831b107939f63cfebf68e6316e1a40f79fc99cae0fee9b333bac8d29bc4:646548289682-ap-southeast-2\\\"\"\n      ]\n    }\n  }\n}",
+                    "Type": "CODEPIPELINE"
+                }
+            },
+            "Metadata": {
+                "aws:cdk:path": "InfraStack/Infra/Pipeline/Assets/FileAsset2/Resource"
+            }
+        },
+        "CILogs9F3DDB03": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+                "RetentionInDays": 1
+            },
+            "UpdateReplacePolicy": "Delete",
+            "DeletionPolicy": "Delete",
+            "Metadata": {
+                "aws:cdk:path": "InfraStack/CI/Logs/Resource"
+            }
+        },
+        "CIServerRepo7F223B0E": {
+            "Type": "AWS::ECR::Repository",
+            "Properties": {
+                "ImageScanningConfiguration": {
+                    "ScanOnPush": true
+                },
+                "RepositoryName": "server"
+            },
+            "UpdateReplacePolicy": "Delete",
+            "DeletionPolicy": "Delete",
+            "Metadata": {
+                "aws:cdk:path": "InfraStack/CI/Server/Repo/Resource"
+            }
+        },
+        "CIServerBuildRoleA253F9E4": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Statement": [
+                        {
+                            "Action": "sts:AssumeRole",
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": "codebuild.amazonaws.com"
+                            }
+                        }
+                    ],
+                    "Version": "2012-10-17"
+                }
+            },
+            "Metadata": {
+                "aws:cdk:path": "InfraStack/CI/Server/Build/Role/Resource"
+            }
+        },
+        "CIServerBuildRoleDefaultPolicy4E4F2C33": {
+            "Type": "AWS::IAM::Policy",
+            "Properties": {
+                "PolicyDocument": {
+                    "Statement": [
+                        {
+                            "Action": ["logs:CreateLogStream", "logs:PutLogEvents"],
+                            "Effect": "Allow",
+                            "Resource": {
+                                "Fn::GetAtt": ["CILogs9F3DDB03", "Arn"]
+                            }
+                        },
+                        {
+                            "Action": ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"],
+                            "Effect": "Allow",
+                            "Resource": [
+                                {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "arn:aws:logs:ap-southeast-2:646548289682:log-group:/aws/codebuild/",
+                                            {
+                                                "Ref": "CIServerBuild61B631CB"
+                                            },
+                                            ":*"
+                                        ]
+                                    ]
+                                },
+                                {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "arn:aws:logs:ap-southeast-2:646548289682:log-group:/aws/codebuild/",
+                                            {
+                                                "Ref": "CIServerBuild61B631CB"
+                                            }
+                                        ]
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "Action": [
+                                "codebuild:BatchPutCodeCoverages",
+                                "codebuild:BatchPutTestCases",
+                                "codebuild:CreateReport",
+                                "codebuild:CreateReportGroup",
+                                "codebuild:UpdateReport"
+                            ],
+                            "Effect": "Allow",
+                            "Resource": {
+                                "Fn::Join": [
+                                    "",
+                                    [
+                                        "arn:aws:codebuild:ap-southeast-2:646548289682:report-group/",
+                                        {
+                                            "Ref": "CIServerBuild61B631CB"
+                                        },
+                                        "-*"
+                                    ]
+                                ]
+                            }
+                        },
+                        {
+                            "Action": ["codebuild:StartBuild", "ecr:*"],
+                            "Effect": "Allow",
+                            "Resource": "*"
+                        }
+                    ],
+                    "Version": "2012-10-17"
+                },
+                "PolicyName": "CIServerBuildRoleDefaultPolicy4E4F2C33",
+                "Roles": [
+                    {
+                        "Ref": "CIServerBuildRoleA253F9E4"
+                    }
+                ]
+            },
+            "Metadata": {
+                "aws:cdk:path": "InfraStack/CI/Server/Build/Role/DefaultPolicy/Resource"
+            }
+        },
+        "CIServerBuild61B631CB": {
+            "Type": "AWS::CodeBuild::Project",
+            "Properties": {
+                "Artifacts": {
+                    "Type": "NO_ARTIFACTS"
+                },
+                "Cache": {
+                    "Type": "NO_CACHE"
+                },
+                "EncryptionKey": "alias/aws/s3",
+                "Environment": {
+                    "ComputeType": "BUILD_GENERAL1_SMALL",
+                    "EnvironmentVariables": [
+                        {
+                            "Name": "ECR_REPO_URI",
+                            "Type": "PLAINTEXT",
+                            "Value": {
+                                "Fn::Join": [
+                                    "",
+                                    [
+                                        {
+                                            "Fn::Select": [
+                                                4,
+                                                {
+                                                    "Fn::Split": [
+                                                        ":",
+                                                        {
+                                                            "Fn::GetAtt": ["CIServerRepo7F223B0E", "Arn"]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        ".dkr.ecr.",
+                                        {
+                                            "Fn::Select": [
+                                                3,
+                                                {
+                                                    "Fn::Split": [
+                                                        ":",
+                                                        {
+                                                            "Fn::GetAtt": ["CIServerRepo7F223B0E", "Arn"]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        ".",
+                                        {
+                                            "Ref": "AWS::URLSuffix"
+                                        },
+                                        "/",
+                                        {
+                                            "Ref": "CIServerRepo7F223B0E"
+                                        }
+                                    ]
+                                ]
+                            }
+                        }
+                    ],
+                    "Image": "aws/codebuild/standard:7.0",
+                    "ImagePullCredentialsType": "CODEBUILD",
+                    "PrivilegedMode": true,
+                    "Type": "LINUX_CONTAINER"
+                },
+                "LogsConfig": {
+                    "CloudWatchLogs": {
+                        "GroupName": {
+                            "Ref": "CILogs9F3DDB03"
+                        },
+                        "Status": "ENABLED"
+                    }
+                },
+                "Name": "server",
+                "ServiceRole": {
+                    "Fn::GetAtt": ["CIServerBuildRoleA253F9E4", "Arn"]
+                },
+                "Source": {
+                    "BuildSpec": "{\n  \"version\": \"0.2\",\n  \"phases\": {\n    \"pre_build\": {\n      \"commands\": [\n        \"env\",\n        \"aws ecr get-login-password --region ap-southeast-2 | docker login --username AWS --password-stdin $ECR_REPO_URI\",\n        \"cd server\"\n      ]\n    },\n    \"build\": {\n      \"commands\": [\n        \"docker build -t $ECR_REPO_URI:$CODEBUILD_RESOLVED_SOURCE_VERSION -t $ECR_REPO_URI:latest .\"\n      ],\n      \"finally\": [\n        \"printf '[{\\\"name\\\":\\\"server\\\",\\\"imageUri\\\":\\\"%s\\\"}]' $ECR_REPO_URI:$TAG > imagedefinitions.json\",\n        \"cat imagedefinitions.json\"\n      ]\n    },\n    \"post_build\": {\n      \"commands\": [\n        \"docker push $ECR_REPO_URI:$CODEBUILD_RESOLVED_SOURCE_VERSION\",\n        \"docker push $ECR_REPO_URI:latest\"\n      ]\n    }\n  },\n  \"artifacts\": {\n    \"files\": [\n      \"imagedefinitions.json\"\n    ]\n  }\n}",
+                    "Location": "https://github.com/Voyen/IS-technical-test.git",
+                    "ReportBuildStatus": true,
+                    "Type": "GITHUB"
+                },
+                "Triggers": {
+                    "FilterGroups": [
+                        [
+                            {
+                                "Pattern": "PUSH",
+                                "Type": "EVENT"
+                            },
+                            {
+                                "Pattern": "refs/heads/main",
+                                "Type": "HEAD_REF"
+                            },
+                            {
+                                "Pattern": "^server/.*",
+                                "Type": "FILE_PATH"
+                            }
+                        ]
+                    ],
+                    "Webhook": true
+                }
+            },
+            "Metadata": {
+                "aws:cdk:path": "InfraStack/CI/Server/Build/Resource"
+            }
+        },
+        "CIClientRepo3F5AF97B": {
+            "Type": "AWS::ECR::Repository",
+            "Properties": {
+                "ImageScanningConfiguration": {
+                    "ScanOnPush": true
+                },
+                "RepositoryName": "client"
+            },
+            "UpdateReplacePolicy": "Delete",
+            "DeletionPolicy": "Delete",
+            "Metadata": {
+                "aws:cdk:path": "InfraStack/CI/Client/Repo/Resource"
+            }
+        },
+        "CIClientBuildRole4C00E763": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Statement": [
+                        {
+                            "Action": "sts:AssumeRole",
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": "codebuild.amazonaws.com"
+                            }
+                        }
+                    ],
+                    "Version": "2012-10-17"
+                }
+            },
+            "Metadata": {
+                "aws:cdk:path": "InfraStack/CI/Client/Build/Role/Resource"
+            }
+        },
+        "CIClientBuildRoleDefaultPolicy17F2F948": {
+            "Type": "AWS::IAM::Policy",
+            "Properties": {
+                "PolicyDocument": {
+                    "Statement": [
+                        {
+                            "Action": ["logs:CreateLogStream", "logs:PutLogEvents"],
+                            "Effect": "Allow",
+                            "Resource": {
+                                "Fn::GetAtt": ["CILogs9F3DDB03", "Arn"]
+                            }
+                        },
+                        {
+                            "Action": ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"],
+                            "Effect": "Allow",
+                            "Resource": [
+                                {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "arn:aws:logs:ap-southeast-2:646548289682:log-group:/aws/codebuild/",
+                                            {
+                                                "Ref": "CIClientBuild15AC2E10"
+                                            },
+                                            ":*"
+                                        ]
+                                    ]
+                                },
+                                {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "arn:aws:logs:ap-southeast-2:646548289682:log-group:/aws/codebuild/",
+                                            {
+                                                "Ref": "CIClientBuild15AC2E10"
+                                            }
+                                        ]
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "Action": [
+                                "codebuild:BatchPutCodeCoverages",
+                                "codebuild:BatchPutTestCases",
+                                "codebuild:CreateReport",
+                                "codebuild:CreateReportGroup",
+                                "codebuild:UpdateReport"
+                            ],
+                            "Effect": "Allow",
+                            "Resource": {
+                                "Fn::Join": [
+                                    "",
+                                    [
+                                        "arn:aws:codebuild:ap-southeast-2:646548289682:report-group/",
+                                        {
+                                            "Ref": "CIClientBuild15AC2E10"
+                                        },
+                                        "-*"
+                                    ]
+                                ]
+                            }
+                        },
+                        {
+                            "Action": ["codebuild:StartBuild", "ecr:*"],
+                            "Effect": "Allow",
+                            "Resource": "*"
+                        }
+                    ],
+                    "Version": "2012-10-17"
+                },
+                "PolicyName": "CIClientBuildRoleDefaultPolicy17F2F948",
+                "Roles": [
+                    {
+                        "Ref": "CIClientBuildRole4C00E763"
+                    }
+                ]
+            },
+            "Metadata": {
+                "aws:cdk:path": "InfraStack/CI/Client/Build/Role/DefaultPolicy/Resource"
+            }
+        },
+        "CIClientBuild15AC2E10": {
+            "Type": "AWS::CodeBuild::Project",
+            "Properties": {
+                "Artifacts": {
+                    "Type": "NO_ARTIFACTS"
+                },
+                "Cache": {
+                    "Type": "NO_CACHE"
+                },
+                "EncryptionKey": "alias/aws/s3",
+                "Environment": {
+                    "ComputeType": "BUILD_GENERAL1_SMALL",
+                    "EnvironmentVariables": [
+                        {
+                            "Name": "ECR_REPO_URI",
+                            "Type": "PLAINTEXT",
+                            "Value": {
+                                "Fn::Join": [
+                                    "",
+                                    [
+                                        {
+                                            "Fn::Select": [
+                                                4,
+                                                {
+                                                    "Fn::Split": [
+                                                        ":",
+                                                        {
+                                                            "Fn::GetAtt": ["CIClientRepo3F5AF97B", "Arn"]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        ".dkr.ecr.",
+                                        {
+                                            "Fn::Select": [
+                                                3,
+                                                {
+                                                    "Fn::Split": [
+                                                        ":",
+                                                        {
+                                                            "Fn::GetAtt": ["CIClientRepo3F5AF97B", "Arn"]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        ".",
+                                        {
+                                            "Ref": "AWS::URLSuffix"
+                                        },
+                                        "/",
+                                        {
+                                            "Ref": "CIClientRepo3F5AF97B"
+                                        }
+                                    ]
+                                ]
+                            }
+                        }
+                    ],
+                    "Image": "aws/codebuild/standard:7.0",
+                    "ImagePullCredentialsType": "CODEBUILD",
+                    "PrivilegedMode": true,
+                    "Type": "LINUX_CONTAINER"
+                },
+                "LogsConfig": {
+                    "CloudWatchLogs": {
+                        "GroupName": {
+                            "Ref": "CILogs9F3DDB03"
+                        },
+                        "Status": "ENABLED"
+                    }
+                },
+                "Name": "client",
+                "ServiceRole": {
+                    "Fn::GetAtt": ["CIClientBuildRole4C00E763", "Arn"]
+                },
+                "Source": {
+                    "BuildSpec": "{\n  \"version\": \"0.2\",\n  \"phases\": {\n    \"pre_build\": {\n      \"commands\": [\n        \"env\",\n        \"aws ecr get-login-password --region ap-southeast-2 | docker login --username AWS --password-stdin $ECR_REPO_URI\",\n        \"cd client\"\n      ]\n    },\n    \"build\": {\n      \"commands\": [\n        \"docker build -t $ECR_REPO_URI:$CODEBUILD_RESOLVED_SOURCE_VERSION -t $ECR_REPO_URI:latest .\"\n      ],\n      \"finally\": [\n        \"printf '[{\\\"name\\\":\\\"client\\\",\\\"imageUri\\\":\\\"%s\\\"}]' $ECR_REPO_URI:$TAG > imagedefinitions.json\",\n        \"cat imagedefinitions.json\"\n      ]\n    },\n    \"post_build\": {\n      \"commands\": [\n        \"docker push $ECR_REPO_URI:$CODEBUILD_RESOLVED_SOURCE_VERSION\",\n        \"docker push $ECR_REPO_URI:latest\"\n      ]\n    }\n  },\n  \"artifacts\": {\n    \"files\": [\n      \"imagedefinitions.json\"\n    ]\n  }\n}",
+                    "Location": "https://github.com/Voyen/IS-technical-test.git",
+                    "ReportBuildStatus": true,
+                    "Type": "GITHUB"
+                },
+                "Triggers": {
+                    "FilterGroups": [
+                        [
+                            {
+                                "Pattern": "PUSH",
+                                "Type": "EVENT"
+                            },
+                            {
+                                "Pattern": "refs/heads/main",
+                                "Type": "HEAD_REF"
+                            },
+                            {
+                                "Pattern": "^client/.*",
+                                "Type": "FILE_PATH"
+                            }
+                        ]
+                    ],
+                    "Webhook": true
+                }
+            },
+            "Metadata": {
+                "aws:cdk:path": "InfraStack/CI/Client/Build/Resource"
+            }
+        },
+        "CDKMetadata": {
+            "Type": "AWS::CDK::Metadata",
+            "Properties": {
+                "Analytics": "v2:deflate64:H4sIAAAAAAAA/0VQOw7CMAw9C3tqSmFghoGFoSoHQG1qkNtQV0kDQlHuTvoJnd7HT36WM9gddpBuyo9JZN0miipwt6GUreipR0UdGjhzjfmiREjenQxOnIP7z86PLnIvzB7cycoWh9Ff2Aw5K5Lf1Z61F1S+wBWspk0TrsmYGasrS6pee3PNDcqpJtIFvVD8NOCu/Lxotv0YidwLlDrUYc+GBtZTy6q8FwUatlrO1yzciy4cAI3ZvrMUjuF1jSFKtO0GeiEUM/4A0gu1SlcBAAA="
+            },
+            "Metadata": {
+                "aws:cdk:path": "InfraStack/CDKMetadata/Default"
+            }
+        }
+    },
+    "Parameters": {
+        "BootstrapVersion": {
+            "Type": "AWS::SSM::Parameter::Value<String>",
+            "Default": "/cdk-bootstrap/hnb659fds/version",
+            "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+        }
+    },
+    "Rules": {
+        "CheckBootstrapVersion": {
+            "Assertions": [
+                {
+                    "Assert": {
+                        "Fn::Not": [
+                            {
+                                "Fn::Contains": [
+                                    ["1", "2", "3", "4", "5"],
+                                    {
+                                        "Ref": "BootstrapVersion"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+                }
+            ]
+        }
+    }
+}

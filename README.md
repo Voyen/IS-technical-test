@@ -19,3 +19,10 @@ Stop the solution:
 ```sh
 make stop
 ```
+
+---
+
+Full documentation available here:
+- [Documentation](./docs/docs.md)
+- [Assumptions](./docs/assumptions.md)
+- [Sources](./docs/sources.md)
